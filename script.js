@@ -26,17 +26,20 @@ window.onload = function(){
   function MainView(){
     this.render = function(){
       //player1.onload = function(){} 
-      //var sprite1 = new Image();
-      //sprite1.src = "";
-      //sprite1.onload = function(){}
-      //var sprite2 = new Image();
-      //sprite2.src = "";
+      var player = new Image();
+      player.src = "developer.png";
+      player.addEventListener('load', ()=>{});
+      var bug = new Image();
+      bug.src = "bug.png";
+      c.drawImage(bug, 500, 500, 100, 100);
+      c.drawImage(player, 50, 50, 100, 100);
     }
   }
+
   var mainview = new MainView();
   function animate(){
     mainview.render();
-    requestAnimationFrame("animate");
+    requestAnimationFrame(animate);
   }
   animate();
 
