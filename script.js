@@ -44,10 +44,11 @@ let controller = {
 
 const mainView = {
   init: () => {
+    this.jumpCount = 0;
     this.bugX = 0;
     this.bugY = 0;
     this.playerX = 0;
-    this.playerY = 0;
+    this.playerY = innerHeight - 100;
     this.player = new Image();
     this.player.addEventListener('load', () => { });
     this.player.src = "developer.png";
@@ -57,13 +58,16 @@ const mainView = {
     document.addEventListener('keydown', (e) => {
       switch (e.key) {
         case 'ArrowUp':
-          if (this.playerY > 0) {
-            this.playerY -= 5;
+          if (this.playerY > 0 && this.jumpCount < 2) {
+            this.playerY -= 100;
+            this.jumpCount++;
+          } else if(this.playerY == innerHeight - 100){
+            this.jumpCount = 0;
           }
           break;
         case 'ArrowDown':
           if (this.playerY + 100 < innerHeight) {
-            this.playerY += 5;
+            this.playerY += 10;
           }
           break;
         case 'ArrowLeft':
@@ -80,6 +84,9 @@ const mainView = {
     });
   },
   render: () => {
+    if (this.playerY + 100 < innerHeight) {
+      this.playerY += 2;
+    }
     c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
     c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
   }
