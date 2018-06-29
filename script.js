@@ -1,87 +1,90 @@
-window.onload = function(){
-  var canvas = document.getElementById("canvas");
-  var c = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  canvas.addEventListener("click", function(event){
+let model = {
+  clickCount: 0
+}
+
+let controller = {
+  init: () => {
+    let canvas = document.getElementById("canvas");
+    this.c = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.addEventListener("click", function (event) {
       this.x = event.pageX;
       this.y = event.pageY;
-      if(this.x < canvas.width / 2 && this.y > canvas.height / 2.5){
+      if (this.x < canvas.width / 2 && this.y > canvas.height / 2.5) {
         //move backwards(left)
       }
-      if(this.x > canvas.width / 2 && this.y > canvas.height / 2.5){
+      if (this.x > canvas.width / 2 && this.y > canvas.height / 2.5) {
         //move foreward(right)
       }
-      if(this.y < canvas.height / 2.5){
+      if (this.y < canvas.height / 2.5) {
         //jump
       }
-  });
+    });
 
-  //Device width / height specifications
-  if (window.innerHeight < 900) {
+    //Device width / height specifications
+    if (window.innerHeight < 900) {
 
-  } else {
-    
-  }
-  function MainView(){
-    this.render = function(){
-      //player1.onload = function(){} 
-      var player = new Image();
-      player.src = "developer.png";
-      player.addEventListener('load', ()=>{});
-      var bug = new Image();
-      bug.src = "bug.png";
-      c.drawImage(bug, 500, 500, 100, 100);
-      c.drawImage(player, 50, 50, 100, 100);
+    } else {
+
     }
-  }
 
-  var mainview = new MainView();
-  function animate(){
-    mainview.render();
-    requestAnimationFrame(animate);
+    mainView.init();
+    controller.animate();
+  },
+  incrementCounter: () => {
+    model.clickCount++;
+  },
+  animate: () => {
+    this.c.clearRect(0, 0, canvas.width, canvas.height);
+    mainView.render();
+    requestAnimationFrame(controller.animate);
   }
-  animate();
-
 }
-/*
-  let model = {
-    clickCount: 0
-  }
-  let octopus = {
-    init: () => {
-      playerView.init();
-      obstracleView.init();
-    },
-    incrementCounter: () => {
-      model.clickCount++;
-    },
-  }
 
-  const mainView = {
-    init: () => {
-      player1.onload = function(){alert(8)} 
-      var sprite1 = new Image();
-      sprite1.src =
-        "";
-      sprite1.onload = function(){}
-      var sprite2 = new Image();
-      sprite2.src =
-        "";
-    }
+const mainView = {
+  init: () => {
+    this.bugX = 0;
+    this.bugY = 0;
+    this.playerX = 0;
+    this.playerY = 0;
+    this.player = new Image();
+    this.player.addEventListener('load', () => { });
+    this.player.src = "developer.png";
+    this.bug = new Image();
+    this.bug.addEventListener('load', () => { });
+    this.bug.src = "bug.png";
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp':
+          if (this.playerY > 0) {
+            this.playerY -= 5;
+          }
+          break;
+        case 'ArrowDown':
+          if (this.playerY + 100 < innerHeight) {
+            this.playerY += 5;
+          }
+          break;
+        case 'ArrowLeft':
+          if (this.playerX > 0) {
+            this.playerX -= 5;
+          }
+          break;
+        case 'ArrowRight':
+          if (this.playerX + 100 < innerWidth) {
+            this.playerX += 5;
+          }
+          break;
+      }
+    });
+  },
+  render: () => {
+    c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
+    c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
   }
-  let playerView = {
-    init: () => {
-      this.scoreElem = document.getElementById('score');
+}
 
-    },
-    move: (direction) => {
-    }
-  }
-
-  let obstracleView = {
-    init: () => {
-
-    }
-  }
-  */
+onload = () => {
+  controller.init();
+}
