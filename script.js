@@ -1,6 +1,9 @@
 let model = {
   clickCount: 0,
-  level: innerHeight - (innerHeight / 5)
+  level: innerHeight - (innerHeight / 5),
+  playerSpeedX: 0,
+  playerSpeedY: 0,
+  score: 0
 }
 
 let controller = {
@@ -9,27 +12,15 @@ let controller = {
     this.c = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    canvas.addEventListener('click', function (event) {
+    canvas.addEventListener('click', event => {
       this.x = event.pageX;
       this.y = event.pageY;
-      if (this.x < canvas.width / 2 && this.y > canvas.height / 2.5) {
-        // left
-      }
-      if (this.x > canvas.width / 2 && this.y > canvas.height / 2.5) {
-        // right
-      }
-      if (this.y < canvas.height / 2.5) {
-        // jump
-      }
-
+      if (this.x < canvas.width / 2 && this.y > canvas.height / 2.5) {} // left
+      if (this.x > canvas.width / 2 && this.y > canvas.height / 2.5) {} // right
+      if (this.y < canvas.height / 2.5) {} // jump
     });
 
-    // Device width / height specifications
-    if (window.innerHeight < 900) {
-
-    } else {
-
-    }
+    if (window.innerHeight < 900) {} else {} // Device width / height specifications
     mainView.init();
     setInterval(controller.animate, 20);
   },
@@ -38,97 +29,20 @@ let controller = {
   },
   animate: () => {
     this.c.clearRect(0, 0, canvas.width, canvas.height);
-    if (mainView.keys && mainView.keys[37]) { model.playerSpeedX = -1; }
-    if (mainView.keys && mainView.keys[39]) { model.playerSpeedX = 1; }
-    if (mainView.keys && mainView.keys[38]) { model.playerSpeedY = -1; }
-    if (mainView.keys && mainView.keys[40]) { model.playerSpeedY = 1; }
+    if (mainView.keys && mainView.keys[65]) { model.playerSpeedX = -2; } // left
+    if (mainView.keys && mainView.keys[68]) { model.playerSpeedX = 2; } // right
+    if (mainView.keys && mainView.keys[87]) { model.playerSpeedY = -2; }  // up
+    if (mainView.keys && mainView.keys[83]) { model.playerSpeedY = 2; } // down
     mainView.render();
-    playerView.render();
   }
 }
 
 const mainView = {
   init: () => {
-    // 200 / 5 = 40
-    // 200 - 40 = 160
-    playerView.init();
+    bugView.init();
     this.jumpCount = 0;
-    this.bugX = innerWidth - 100;
-    this.bugY = model.level - 100;
     this.floor = new Image();
     this.floor.src = 'floor.png';
-    this.bug = new Image();
-    this.bug.src = 'bug.png';
-    /*document.addEventListener('keydown', (e) => {
-      switch (e.code) {
-        case 'ArrowUp':
-          if (this.playerY > 0 && this.jumpCount < 2) {
-            this.playerY -= 100;
-            this.jumpCount++;
-          } else if (this.playerY == model.level - 100) {
-            this.jumpCount = 0;
-          }
-          break;
-        case 'ArrowDown':
-          if (this.playerY + 100 < innerHeight) {
-            this.playerY += 10;
-          }
-          break;
-        case 'ArrowLeft':
-          if (this.playerX > 0) {
-            this.playerX -= 5;
-          }
-          break;
-        case 'ArrowRight':
-          if (this.playerX + 100 < innerWidth) {
-            this.playerX += 5;
-          }
-          break;
-        case 'KeyA': // left
-          if (this.playerX > 0) {
-            this.playerX -= 5;
-          }
-          break;
-        case 'KeyD':// right
-          if (this.playerX + 100 < innerWidth) {
-            this.playerX += 5;
-          }
-          break;
-        case 'Space':// jump
-          if (this.playerY > 0 && this.jumpCount < 2) {
-            this.playerY -= 100;
-            this.jumpCount++;
-          } else if (this.playerY == model.level - 100) {
-            this.jumpCount = 0;
-          }
-          break;
-        case 'KeyS':// down
-          if (this.playerY + 100 < model.level) {
-            this.playerY += 10;
-          }
-          break;
-      }
-    });*/
-  },
-  render: () => {
-    // Make the player fall slowly
-    if (this.playerY + 100 < model.level) {
-      this.playerY += 2;
-    }
-    if (this.bugY + 100 < model.level) {
-      this.bugY += 2;
-    }
-    if ((this.playerY + 50 > bugY && this.playerY - 50 < bugY) && (this.playerX + 50 > bugX && this.playerX - 50 < bugX)) {
-      this.bug.src = '';
-    }
-    c.drawImage(this.floor, 0, model.level, innerWidth, innerHeight / 4);
-    c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
-    c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
-  }
-}
-
-let playerView = {
-  init: () => {
     this.playerX = 0;
     this.playerY = model.level - 100;
     this.player = new Image();
@@ -138,12 +52,46 @@ let playerView = {
       mainView.keys[e.keyCode] = (e.type == "keydown");
     });
     window.addEventListener('keyup', e => {
+      if (mainView.keys && mainView.keys[65]) { model.playerSpeedX = 0; } // left
+      if (mainView.keys && mainView.keys[68]) { model.playerSpeedX = 0; } // right
+      if (mainView.keys && mainView.keys[87]) { model.playerSpeedY = 0; }  // up
+      if (mainView.keys && mainView.keys[83]) { model.playerSpeedY = 0; } // down
       mainView.keys[e.keyCode] = (e.type == "keydown");
     });
   },
   render: () => {
-    this.playerX = model.playerSpeedX;
-    this.playerY = model.playerSpeedY;
+    if (this.playerX + model.playerSpeedX <= innerWidth - 100 && this.playerX + model.playerSpeedX >= 0) {
+      this.playerX += model.playerSpeedX * 2;
+    }
+    if(this.playerY + model.playerSpeedY <= innerHeight - ((innerHeight / 5) + 100) && this.playerY + model.playerSpeedY >= 0){
+      this.playerY += model.playerSpeedY;
+    }
+    if (this.bugY + 100 < model.level) {
+      this.bugY += 2;
+    }
+    bugView.render();
+    if ((this.playerY + 50 > bugY && this.playerY - 50 < bugY) && (this.playerX + 50 > bugX && this.playerX - 50 < bugX)) {
+      this.bugX = Math.random() * innerWidth - 100;
+      this.bugY = Math.random() * innerHeight - ((innerHeight / 5) + 100);
+      model.score++;
+    }
+    c.font = 'bold 42px Arial';
+    c.fillStyle = 'white';
+    c.fillText('Punkte: ' + model.score, 100, 100);
+    c.drawImage(this.floor, 0, model.level, innerWidth, innerHeight / 4);
+    c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
+  }
+}
+
+const bugView = {
+  init: () => {
+    this.bug = new Image();
+    this.bug.src = 'bug.png';
+    this.bugX = innerWidth - 100;
+    this.bugY = model.level - 100;
+  },
+  render: () => {
+    c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
   }
 }
 onload = () => {
