@@ -44,11 +44,14 @@ let controller = {
 
 const mainView = {
   init: () => {
+    // 200 / 5 = 40
+    // 200 - 40 = 160
+    this.level = innerHeight - (innerHeight / 5);
     this.jumpCount = 0;
-    this.bugX = 0;
-    this.bugY = innerHeight / 5;
+    this.bugX = innerWidth - 100;
+    this.bugY = level - 100;
     this.playerX = 0;
-    this.playerY = innerHeight / 5;
+    this.playerY = level - 100;
     this.floor = new Image();
     this.floor.src = 'floor.png';
     this.player = new Image();
@@ -61,7 +64,7 @@ const mainView = {
           if (this.playerY > 0 && this.jumpCount < 2) {
             this.playerY -= 100;
             this.jumpCount++;
-          } else if (this.playerY == innerHeight - 100) {
+          } else if (this.playerY == level - 100) {
             this.jumpCount = 0;
           }
           break;
@@ -94,12 +97,12 @@ const mainView = {
           if (this.playerY > 0 && this.jumpCount < 2) {
             this.playerY -= 100;
             this.jumpCount++;
-          } else if (this.playerY == innerHeight - 100) {
+          } else if (this.playerY == level - 100) {
             this.jumpCount = 0;
           }
           break;
         case 'KeyS':// down
-          if (this.playerY + 100 < innerHeight) {
+          if (this.playerY + 100 < level) {
             this.playerY += 10;
           }
           break;
@@ -108,16 +111,16 @@ const mainView = {
   },
   render: () => {
     // Make the player fall slowly
-    if (this.playerY + innerHeight / 5 < innerHeight) {
+    if (this.playerY + 100 < level) {
       this.playerY += 2;
     }
-    if ((this.playerY + 50 > bugY && this.playerY - 50 < bugY) && (this.playerX + 50 > bugX && this.playerX - 50 < bugX)){
-      this.bug.src = '';
-    }
-    if (this.bugY + innerHeight / 5 < innerHeight) {
+    if (this.bugY + 100 < level) {
       this.bugY += 2;
     }
-    c.drawImage(this.floor, 0, innerHeight - (innerHeight / 5), innerWidth, innerHeight / 4);
+    if ((this.playerY + 50 > bugY && this.playerY - 50 < bugY) && (this.playerX + 50 > bugX && this.playerX - 50 < bugX)) {
+      this.bug.src = '';
+    }
+    c.drawImage(this.floor, 0, level, innerWidth, innerHeight / 4);
     c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
     c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
   }
