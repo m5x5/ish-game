@@ -1,5 +1,6 @@
 let model = {
-  clickCount: 0
+  clickCount: 0,
+  level: innerHeight - (innerHeight / 5)
 }
 
 let controller = {
@@ -30,15 +31,19 @@ let controller = {
 
     }
     mainView.init();
-    controller.animate();
+    setInterval(controller.animate, 20);
   },
   incrementCounter: () => {
     model.clickCount++;
   },
   animate: () => {
     this.c.clearRect(0, 0, canvas.width, canvas.height);
+    if (mainView.keys && mainView.keys[37]) { model.playerSpeedX = -1; }
+    if (mainView.keys && mainView.keys[39]) { model.playerSpeedX = 1; }
+    if (mainView.keys && mainView.keys[38]) { model.playerSpeedY = -1; }
+    if (mainView.keys && mainView.keys[40]) { model.playerSpeedY = 1; }
     mainView.render();
-    requestAnimationFrame(controller.animate);
+    playerView.render();
   }
 }
 
@@ -46,25 +51,21 @@ const mainView = {
   init: () => {
     // 200 / 5 = 40
     // 200 - 40 = 160
-    this.level = innerHeight - (innerHeight / 5);
+    playerView.init();
     this.jumpCount = 0;
     this.bugX = innerWidth - 100;
-    this.bugY = level - 100;
-    this.playerX = 0;
-    this.playerY = level - 100;
+    this.bugY = model.level - 100;
     this.floor = new Image();
     this.floor.src = 'floor.png';
-    this.player = new Image();
-    this.player.src = 'developer.png';
     this.bug = new Image();
     this.bug.src = 'bug.png';
-    document.addEventListener('keydown', (e) => {
+    /*document.addEventListener('keydown', (e) => {
       switch (e.code) {
         case 'ArrowUp':
           if (this.playerY > 0 && this.jumpCount < 2) {
             this.playerY -= 100;
             this.jumpCount++;
-          } else if (this.playerY == level - 100) {
+          } else if (this.playerY == model.level - 100) {
             this.jumpCount = 0;
           }
           break;
@@ -97,32 +98,52 @@ const mainView = {
           if (this.playerY > 0 && this.jumpCount < 2) {
             this.playerY -= 100;
             this.jumpCount++;
-          } else if (this.playerY == level - 100) {
+          } else if (this.playerY == model.level - 100) {
             this.jumpCount = 0;
           }
           break;
         case 'KeyS':// down
-          if (this.playerY + 100 < level) {
+          if (this.playerY + 100 < model.level) {
             this.playerY += 10;
           }
           break;
       }
-    });
+    });*/
   },
   render: () => {
     // Make the player fall slowly
-    if (this.playerY + 100 < level) {
+    if (this.playerY + 100 < model.level) {
       this.playerY += 2;
     }
-    if (this.bugY + 100 < level) {
+    if (this.bugY + 100 < model.level) {
       this.bugY += 2;
     }
     if ((this.playerY + 50 > bugY && this.playerY - 50 < bugY) && (this.playerX + 50 > bugX && this.playerX - 50 < bugX)) {
       this.bug.src = '';
     }
-    c.drawImage(this.floor, 0, level, innerWidth, innerHeight / 4);
+    c.drawImage(this.floor, 0, model.level, innerWidth, innerHeight / 4);
     c.drawImage(this.bug, this.bugX, this.bugY, 100, 100);
     c.drawImage(this.player, this.playerX, this.playerY, 100, 100);
+  }
+}
+
+let playerView = {
+  init: () => {
+    this.playerX = 0;
+    this.playerY = model.level - 100;
+    this.player = new Image();
+    this.player.src = 'developer.png';
+    window.addEventListener('keydown', e => {
+      mainView.keys = (mainView.keys || []);
+      mainView.keys[e.keyCode] = (e.type == "keydown");
+    });
+    window.addEventListener('keyup', e => {
+      mainView.keys[e.keyCode] = (e.type == "keydown");
+    });
+  },
+  render: () => {
+    this.playerX = model.playerSpeedX;
+    this.playerY = model.playerSpeedY;
   }
 }
 onload = () => {
