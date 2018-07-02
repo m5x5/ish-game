@@ -12,7 +12,8 @@ body {
 
 #canvas {
   border: 2px solid black;
-  background-image: url("main_background_image.jpg");
+  /*background-image: url("main_background_image.jpg");*/
+  background-color: #222;
   padding-top: -50px;
   background-size: 100% 100%;
 }
