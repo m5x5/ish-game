@@ -32,14 +32,6 @@ let controller = {
     this.c = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    /*canvas.addEventListener('click', event => {
-      this.x = event.pageX;
-      this.y = event.pageY;
-      if (this.x < canvas.width / 2 && this.y > canvas.height / 2.5) {} // left
-      if (this.x > canvas.width / 2 && this.y > canvas.height / 2.5) {} // right
-      if (this.y < canvas.height / 2.5) {} // jump
-    });
-    if (window.innerHeight < 900) {} else {}*/ // Device width / height specifications
     mainView.init();
     setInterval(controller.animate, 20);
   },
@@ -50,8 +42,28 @@ let controller = {
     this.c.clearRect(0, 0, canvas.width, canvas.height);
     if (mainView.keys && mainView.keys[65]) { model.playerSpeedX = -2; } // left
     if (mainView.keys && mainView.keys[68]) { model.playerSpeedX = 2; } // right
-    if (mainView.keys && mainView.keys[87]) { if ((model.jumpCount < 20)) { model.playerSpeedY = -6; model.jumpCount++; } else { playerSpeedY = 0; } }  // up
+    if (mainView.keys && mainView.keys[87] && (model.jumpCount < 20)) { model.playerSpeedY = -6; model.jumpCount++; } else { playerSpeedY = 0; }  // up
     if (mainView.keys && mainView.keys[83]) { model.playerSpeedY = 2; } // down
+    if (innerWidth < 850) {
+      canvas.addEventListener('click', event => {
+        this.x = event.pageX;
+        this.y = event.pageY;
+        switch (true) {
+          case (this.x < canvas.width / 2 && this.y > canvas.height / 2.5):
+            model.playerSpeedX = -2;
+            break;
+          case (this.x > canvas.width / 2 && this.y > canvas.height / 2.5):
+            model.playerSpeedX = 2;
+            break;
+          case (this.y < canvas.height / 2.5):
+            model.playerSpeedY = -6; model.jumpCount++;
+            break;
+          default:
+            playerSpeedY = 2;
+            break
+        } 
+      });
+    }
     mainView.render();
   }
 }
@@ -61,7 +73,7 @@ const mainView = {
     bugView.init();
     this.jumpCount = 0;
     this.floor = new Image();
-    this.floor.src = 'blocks/_rocky/rocky01.png';
+    this.floor.src = 'img/blocks/rocky/rocky01.png';
     window.addEventListener('keydown', e => {
       mainView.keys = (mainView.keys || []);
       mainView.keys[e.keyCode] = (e.type == "keydown");
@@ -95,23 +107,33 @@ const mainView = {
 
 const playerView = {
   init: () => {
+    this.runCount = 0;
     this.player = new Image();
-    this.player.src = 'Gbot_2d/pose_origin.png';
+    this.player.src = 'img/player/pose_origin.png';
     this.playerX = 0;
     this.playerY = model.level - 127;
     model.playerSpeedY = 0;
   },
   render: () => {
+    if (model.playerSpeedX < 0) {
+      this.imgFolder = 'img/player/';
+    } else {
+      this.imgFolder = 'img/player-reversed/';
+    }
     switch (true) {
       case (model.playerSpeedY < 0):
-        this.player.src = 'Gbot_2d/jump_up.png';
+        this.player.src = this.imgFolder + 'jump_up.png';
         break;
-        case (model.playerSpeedY > 0 && this.playerY + 127 != model.level):
-        this.player.src = 'Gbot_2d/jump_down.png';
+      case (model.playerSpeedY > 0 && this.playerY + 127 != model.level):
+        this.player.src = this.imgFolder + 'jump_down.png';
         break;
-        case (model.playerSpeedY > 0 && this.playerY + 127 == model.level):
-        this.player.src = 'Gbot_2d/pose_origin.png';
+      case (model.playerSpeedX == 0 && this.playerY + 127 == model.level):
+        this.player.src = this.imgFolder + 'pose_origin.png';
         break;
+      case (model.playerSpeedX != 0 && this.playerY + 127 == model.level):
+        this.runCount++;
+        this.runCount = Math.round(this.runCount / 5) > 4 ? 0 : this.runCount;
+        this.player.src = this.imgFolder + `run/run0${Math.round(this.runCount / 5)}.png`;
     }
     if (model.jumpCount == 20) {
       model.playerSpeedY = 0;
@@ -137,7 +159,7 @@ const playerView = {
 const bugView = {
   init: () => {
     this.bug = new Image();
-    this.bug.src = 'bug.png';
+    this.bug.src = 'img/bug.png';
     this.bugX = innerWidth - 100;
     this.bugY = model.level - 100;
   },
